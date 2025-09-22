@@ -11,6 +11,7 @@ import '../../modals/Users.dart';
 import '../../sevices/UserProvider.dart';
 import '../../sevices/ThameProvider.dart';
 import '../mealsDetailsScreen.dart';
+import '../AddFoodLogScreen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -81,6 +82,17 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
               ),
             ),
           ],
+        ),
+
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddFoodScreen()),
+            );
+          },
+          backgroundColor: accentColor,
+          child: const Icon(Icons.add, color: Colors.white),
         ),
       ),
     );
