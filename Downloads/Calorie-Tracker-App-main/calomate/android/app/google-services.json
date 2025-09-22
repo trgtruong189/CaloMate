@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "335613778986-pq1vf0lrtlkjc2njf188unequobjj4rn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rifath.calomate",
+            "certificate_hash": "3cd6e608300978be465cdcc4107ff962e52ee8f2"
+          }
+        },
+        {
           "client_id": "335613778986-q4efr0skdi6m7rpsgt9t68cqcbub5vt2.apps.googleusercontent.com",
           "client_type": 3
         }

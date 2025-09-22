@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:provider/provider.dart';
-
 import '../../sevices/ThameProvider.dart';
- // Import ThemeProvider
+import '../../sevices/UserProvider.dart'; // Thêm import UserProvider
 
 class SignScreen extends StatefulWidget {
   const SignScreen({super.key});
@@ -15,6 +14,8 @@ class SignScreen extends StatefulWidget {
 }
 
 class _SignScreenState extends State<SignScreen> {
+  bool isLoading = false; // Thêm trạng thái loading
+
   void _showBottomSheet(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     final isDarkMode = themeProvider.isDarkMode;
@@ -45,13 +46,27 @@ class _SignScreenState extends State<SignScreen> {
                 _buildSignInButton(
                   icon: Image.asset('assets/images/googleIcon.png', height: 24),
                   label: 'Đăng nhập với Google',
-                  onPressed: () {},
+                  onPressed: isLoading
+                      ? () {} // Vô hiệu hóa khi đang loading
+                      : () async {
+                    setState(() => isLoading = true); // Bật loading
+                    bool success = await Provider.of<UserProvider>(context, listen: false)
+                        .loginWithGoogle();
+                    setState(() => isLoading = false); // Tắt loading
+                    if (success) {
+                      Navigator.pushReplacementNamed(context, '/recipeScreen');
+                    } else {
+                      _showSnackBar(context, 'Đăng nhập Google thất bại.', Colors.redAccent);
+                    }
+                  },
                 ),
                 SizedBox(height: 10.0),
                 _buildSignInButton(
                   icon: Icon(CupertinoIcons.mail, color: Colors.blue),
                   label: 'Đăng nhập với Email',
-                  onPressed: () => Navigator.pushNamed(context, '/login'),
+                  onPressed: isLoading
+                      ? () {} // Vô hiệu hóa khi đang loading
+                      : () => Navigator.pushNamed(context, '/login'),
                 ),
                 SizedBox(height: 20.0),
               ],
@@ -87,7 +102,18 @@ class _SignScreenState extends State<SignScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              icon,
+              isLoading && label == 'Đăng nhập với Google'
+                  ? SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    isDarkMode ? Colors.white : Colors.black87,
+                  ),
+                ),
+              )
+                  : icon,
               SizedBox(width: 12),
               Text(
                 label,
@@ -102,6 +128,16 @@ class _SignScreenState extends State<SignScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _showSnackBar(BuildContext context, String message, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: GoogleFonts.poppins(fontSize: 14.0)),
+        backgroundColor: color,
+        duration: Duration(seconds: 3),
       ),
     );
   }
@@ -157,7 +193,9 @@ class _SignScreenState extends State<SignScreen> {
                     child: SizedBox(
                       width: double.infinity,
                       child: TextButton(
-                        onPressed: () => _showBottomSheet(context),
+                        onPressed: isLoading
+                            ? null // Vô hiệu hóa khi đang loading
+                            : () => _showBottomSheet(context),
                         style: TextButton.styleFrom(
                           backgroundColor: isDarkMode ? Colors.greenAccent[700] : Color(0xff006d77),
                           padding: EdgeInsets.symmetric(vertical: 16.0),

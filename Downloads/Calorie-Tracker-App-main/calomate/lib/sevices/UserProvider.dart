@@ -246,6 +246,35 @@ class UserProvider with ChangeNotifier {
       print("Logout error: $e");
     }
   }
+  // Thêm: Login với Google
+  Future<bool> loginWithGoogle() async {
+    try {
+      User? firebaseUser = await _authService.signInWithGoogle();
+      if (firebaseUser != null) {
+        setUserId(firebaseUser.uid);
+        await loadUserData();
+
+        // Nếu user chưa tồn tại trong Firestore, tạo mới
+        if (_user == null) {
+          _user = CustomUser(
+            id: firebaseUser.uid,
+            name: firebaseUser.displayName ?? 'Google User',
+            email: firebaseUser.email ?? '',
+            age: 0, // Default, user có thể update sau
+            weight: 0.0,
+            height: 0.0,
+            role: 'USER',
+            waterLog: Water(),
+          );
+          await addUser(_user!); // Sử dụng phương thức addUser hiện có
+        }
+        return true;
+      }
+    } catch (e) {
+      print("Google login error: $e");
+    }
+    return false;
+  }
 
   void listenToUserChanges() {
     _authService.userChanges.listen((firebaseUser) async {
