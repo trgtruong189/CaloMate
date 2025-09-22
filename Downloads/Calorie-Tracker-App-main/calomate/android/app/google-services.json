@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "335613778986",
+    "project_id": "calomate-563e8",
+    "storage_bucket": "calomate-563e8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:335613778986:android:f099c8e3cd9b11ad22f753",
+        "android_client_info": {
+          "package_name": "com.rifath.calomate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "335613778986-q4efr0skdi6m7rpsgt9t68cqcbub5vt2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_0PTPMBRElrkwM-e3CKfMnE1UBNRbKRs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "335613778986-q4efr0skdi6m7rpsgt9t68cqcbub5vt2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:335613778986:android:f65340b98413b52e22f753",
+        "android_client_info": {
+          "package_name": "com.rifath.calorify_me"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "335613778986-q4efr0skdi6m7rpsgt9t68cqcbub5vt2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_0PTPMBRElrkwM-e3CKfMnE1UBNRbKRs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "335613778986-q4efr0skdi6m7rpsgt9t68cqcbub5vt2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
