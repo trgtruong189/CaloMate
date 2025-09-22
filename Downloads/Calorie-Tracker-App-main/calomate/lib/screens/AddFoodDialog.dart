@@ -1,23 +1,20 @@
-
-
-
-
+// AddFoodDialog.dart
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:animate_do/animate_do.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-
 import '../modals/CustomFood.dart';
 import '../modals/Food.dart';
 import '../sevices/FoodProvider.dart';
-import '../sevices/ThameProvider.dart';
 import '../sevices/UserProvider.dart';
+import '../sevices/ThameProvider.dart';
 
 class AddFoodDialog extends StatefulWidget {
   final String mealType;
+  final DateTime? selectedDate; // optional, for backward compatibility
 
-  AddFoodDialog({required this.mealType});
+  AddFoodDialog({required this.mealType, this.selectedDate});
 
   @override
   _AddFoodDialogState createState() => _AddFoodDialogState();
@@ -26,24 +23,23 @@ class AddFoodDialog extends StatefulWidget {
 class _AddFoodDialogState extends State<AddFoodDialog> {
   final TextEditingController _quantityController = TextEditingController();
   Food? selectedFood;
-  bool isLoading = true; // Loading spinner state
-  bool isAdding = false; // Adding food loader state
-  String? errorMessage; // Error message state
+  bool isLoading = true; // loading suggested foods
+  bool isAdding = false;
+  String? errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    _loadUserFoodList();
   }
 
-  Future<void> _loadUserData() async {
+  Future<void> _loadUserFoodList() async {
     try {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
-      await userProvider.loadUserData();
-
+      await userProvider.loadUserData(); // ensure foodLog loaded
       if (userProvider.foodLog.isEmpty) {
         setState(() {
-          errorMessage = "Không tìm thấy món ăn nào trong nhật ký của bạn..";
+          errorMessage = "Không tìm thấy món ăn nào trong nhật ký của bạn.";
         });
       }
     } catch (e) {
@@ -52,8 +48,85 @@ class _AddFoodDialogState extends State<AddFoodDialog> {
       });
     } finally {
       setState(() {
-        isLoading = false; // Stop spinner once data is loaded
+        isLoading = false;
       });
+    }
+  }
+
+  DateTime _composeTimestampForSelectedDate(DateTime baseDate) {
+    // Use current time but with the selected date (so the day is the one user chose)
+    final now = DateTime.now();
+    return DateTime(baseDate.year, baseDate.month, baseDate.day, now.hour, now.minute, now.second);
+  }
+
+  Future<void> _addFood() async {
+    if (selectedFood == null) {
+      setState(() => errorMessage = "Vui lòng chọn 1 món ăn từ danh sách.");
+      return;
+    }
+
+    if (_quantityController.text.isEmpty || double.tryParse(_quantityController.text) == null) {
+      setState(() => errorMessage = "Vui lòng nhập số lượng hợp lệ.");
+      return;
+    }
+
+    setState(() {
+      isAdding = true;
+      errorMessage = null;
+    });
+
+    try {
+      final quantity = double.parse(_quantityController.text);
+      final cal = (selectedFood!.calories * (quantity / selectedFood!.foodWeight)).round();
+
+      final chosenDate = widget.selectedDate ?? DateTime.now();
+      final timestamp = _composeTimestampForSelectedDate(chosenDate);
+
+      final consumedFood = ConsumedFood(
+        foodName: selectedFood!.foodName,
+        calories: cal,
+        protein: selectedFood!.protein,
+        fat: selectedFood!.fat,
+        foodWeight: quantity,
+        mealType: widget.mealType,
+        timestamp: timestamp,
+        carbs: selectedFood!.carbs,
+      );
+
+      final foodProvider = Provider.of<FoodProvider>(context, listen: false);
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final currentUser = userProvider.user;
+      if (currentUser == null) throw "Không có người dùng";
+
+      // 1) save into user's dailyFoodLog via provider (keeps existing behaviour)
+      await foodProvider.logConsumedFood(consumedFood);
+
+      // 2) add to in-memory user object (so summaries use it immediately)
+      currentUser.logConsumedFood(consumedFood);
+
+      // 3) write to history/{dateKey}/consumedFoods with correct dateKey derived from timestamp
+      final dateKey = "${timestamp.year}-${timestamp.month.toString().padLeft(2,'0')}-${timestamp.day.toString().padLeft(2,'0')}";
+      final historyRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser.id)
+          .collection('history')
+          .doc(dateKey)
+          .collection('consumedFoods')
+          .doc();
+      final historyData = consumedFood.toMap();
+      historyData['timestamp'] = Timestamp.fromDate(consumedFood.timestamp);
+      historyData['dateKey'] = dateKey;
+      await historyRef.set(historyData);
+
+      // 4) refresh provider/user data so UI updates
+      await foodProvider.fetchDailyFoodLog();
+      await userProvider.loadUserData();
+
+      Navigator.pop(context);
+    } catch (e) {
+      setState(() => errorMessage = "Thêm món ăn không thành công: $e");
+    } finally {
+      setState(() => isAdding = false);
     }
   }
 
@@ -61,239 +134,64 @@ class _AddFoodDialogState extends State<AddFoodDialog> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
-
     final userProvider = Provider.of<UserProvider>(context);
     final foodSuggestions = userProvider.foodLog;
 
-    return ZoomIn(
-      duration: Duration(milliseconds: 500),
-      child: AlertDialog(
-        backgroundColor: isDarkMode ? Colors.black : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        titlePadding: EdgeInsets.zero,
-        title: _buildDialogTitle(isDarkMode),
-        content: isLoading
-            ? Center(
-          child: SpinKitFadingCircle(
-            color: isDarkMode ? Colors.greenAccent : Colors.teal,
-            size: 50.0,
-          ),
-        )
-            : _buildDialogContent(foodSuggestions, isDarkMode),
-        actions: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              SlideInLeft(
-                duration: Duration(milliseconds: 300),
-                child: TextButton(
-                  onPressed: isAdding
-                      ? null // Disable cancel button while adding
-                      : () => Navigator.pop(context),
-                  child: Text(
-                    "Huỷ",
-                    style: GoogleFonts.poppins(
-                      color: isDarkMode
-                          ? Colors.greenAccent
-                          : Colors.teal[700],
-                    ),
-                  ),
-                ),
-              ),
-              SlideInRight(
-                duration: Duration(milliseconds: 300),
-                child: isAdding
-                    ? SpinKitCircle(
-                  color: isDarkMode ? Colors.greenAccent : Colors.teal,
-                  size: 40.0,
-                )
-                    : ElevatedButton(
-                  onPressed: _addFood,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isDarkMode
-                        ? Colors.greenAccent
-                        : Colors.teal[700],
-                  ),
-                  child: Text(
-                    "Thêm món ăn",
-                    style: GoogleFonts.poppins(color: Colors.white),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Thêm món ăn - ${widget.mealType}"),
+        backgroundColor: isDarkMode ? Colors.black : Colors.green[700],
       ),
-    );
-  }
-
-  Widget _buildDialogTitle(bool isDarkMode) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            isDarkMode ? Colors.green : Colors.teal,
-            isDarkMode ? Colors.greenAccent : Colors.tealAccent,
+      body: isLoading
+          ? Center(child: SpinKitFadingCircle(color: Colors.green, size: 40))
+          : Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            DropdownButtonFormField<Food>(
+              decoration: InputDecoration(labelText: "Chọn món (gợi ý)"),
+              items: foodSuggestions.map((f) {
+                return DropdownMenuItem(
+                  value: f,
+                  child: Text(f.foodName),
+                );
+              }).toList(),
+              onChanged: (f) => setState(() => selectedFood = f),
+              value: selectedFood,
+              isExpanded: true,
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _quantityController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: "Số lượng (grams)",
+              ),
+            ),
+            const SizedBox(height: 12),
+            if (errorMessage != null) Text(errorMessage!, style: TextStyle(color: Colors.red)),
+            const SizedBox(height: 12),
+            isAdding
+                ? SpinKitCircle(color: Colors.green)
+                : Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                    onPressed: _addFood,
+                    child: Text("Thêm"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isDarkMode ? Colors.greenAccent : Colors.green[700],
+                    )),
+                OutlinedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("Huỷ"),
+                ),
+              ],
+            )
           ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      padding: const EdgeInsets.all(15),
-      child: Center(
-        child: FadeInDown(
-          duration: Duration(milliseconds: 300),
-          child: Text(
-            "Thêm món ăn vào ${widget.mealType}",
-            style: GoogleFonts.poppins(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
         ),
       ),
     );
-  }
-
-  Widget _buildDialogContent(List<Food> foodSuggestions, bool isDarkMode) {
-    if (errorMessage != null) {
-      return Center(
-        child: Text(
-          errorMessage!,
-          style: GoogleFonts.poppins(
-            color: Colors.redAccent,
-            fontSize: 16,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      );
-    }
-
-    if (foodSuggestions.isEmpty) {
-      return Center(
-        child: Text(
-          "Không tìm thấy món ăn nào trong nhật ký của bạn.",
-          style: GoogleFonts.poppins(
-            color: isDarkMode ? Colors.grey[400] : Colors.black87,
-            fontSize: 16,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      );
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        DropdownButton<Food>(
-          hint: Text(
-            "Chọn món ăn",
-            style: GoogleFonts.poppins(
-              color: isDarkMode ? Colors.greenAccent : Colors.black,
-            ),
-          ),
-          value: selectedFood,
-          dropdownColor: isDarkMode ? Colors.black87 : Colors.white,
-          items: foodSuggestions.map((food) {
-            return DropdownMenuItem(
-              value: food,
-              child: Text(
-                food.foodName,
-                style: GoogleFonts.poppins(
-                  color: isDarkMode ? Colors.greenAccent : Colors.teal[800],
-                ),
-              ),
-            );
-          }).toList(),
-          onChanged: (food) => setState(() => selectedFood = food),
-        ),
-        SizedBox(height: 10),
-        TextField(
-          controller: _quantityController,
-          keyboardType: TextInputType.number,
-          style: GoogleFonts.poppins(
-            color: isDarkMode ? Colors.greenAccent : Colors.black87,
-          ),
-          decoration: InputDecoration(
-            labelText: "Số lượng (grams)",
-            labelStyle: GoogleFonts.poppins(
-              color: isDarkMode ? Colors.greenAccent : Colors.teal[800],
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: isDarkMode ? Colors.greenAccent : Colors.teal,
-              ),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: isDarkMode ? Colors.greenAccent : Colors.teal[800]!,
-              ),
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _addFood() async {
-    if (selectedFood == null) {
-      setState(() => errorMessage = "Vui lòng chọn 1 món ăn.");
-      return;
-    }
-
-    if (_quantityController.text.isEmpty ||
-        double.tryParse(_quantityController.text) == null) {
-      setState(() => errorMessage = "Vui lòng nhập một số lượng hợp lệ.");
-      return;
-    }
-
-    setState(() {
-      isAdding = true; // Show loader
-      errorMessage = null;
-    });
-
-    try {
-      double quantity = double.parse(_quantityController.text);
-      double calories =
-          selectedFood!.calories * (quantity / selectedFood!.foodWeight);
-
-      final consumedFood = ConsumedFood(
-        foodName: selectedFood!.foodName,
-        calories: calories.toInt(),
-        protein: selectedFood!.protein,
-        fat: selectedFood!.fat,
-        foodWeight: quantity,
-        mealType: widget.mealType,
-        timestamp: DateTime.now(),
-        carbs: selectedFood!.carbs
-      );
-
-      await Provider.of<FoodProvider>(context, listen: false)
-          .logConsumedFood(consumedFood);
-      // thêm vào history
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      final currentUser = userProvider.user;
-      if (currentUser != null) {
-        // await currentUser.saveHistory(consumedFood);
-        currentUser.logConsumedFood(consumedFood);
-        await currentUser.saveConsumedFood(consumedFood);
-      }
-
-      Navigator.pop(context);
-    } catch (e) {
-      setState(() => errorMessage = "Thêm món ăn không thành công. Vui lòng thử lại.");
-    } finally {
-      setState(() {
-        isAdding = false; // Hide loader
-      });
-    }
-
-
   }
 
   @override
