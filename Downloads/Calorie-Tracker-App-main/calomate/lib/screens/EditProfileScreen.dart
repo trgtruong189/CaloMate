@@ -95,22 +95,29 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       onTap: _pickImage,
                       child: CircleAvatar(
                         radius: 50,
-                        backgroundImage: _image != null
-                            ? FileImage(_image!)
-                            : (widget.user.profileImageUrl != null
-                            ? NetworkImage(widget.user.profileImageUrl!)
-                            : AssetImage('assets/profile_placeholder.png')) as ImageProvider,
-                        backgroundColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                        backgroundImage: const AssetImage('assets/images/img_1.png'),
+                        backgroundColor: Colors.green.shade100,
+                        // _image != null
+                        //     ? FileImage(_image!)
+                        //     : (widget.user.profileImageUrl != null
+                        //     ? NetworkImage(widget.user.profileImageUrl!)
+                        //     : AssetImage('assets/images/img_1.png')) as ImageProvider,
+                        // backgroundColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                        //CircleAvatar(
+                        //                 radius: 60,
+                        //                 backgroundImage: const AssetImage('assets/images/img_1.png'),
+                        //                 backgroundColor: Colors.green.shade100,
+                        //               ),
                       ),
                     ),
                     SizedBox(height: 12),
-                    Text(
-                      'Tap to change profile picture',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12.0,
-                        color: isDarkMode ? Colors.white54 : Colors.grey,
-                      ),
-                    ),
+                    // Text(
+                    //   'Tap to change profile picture',
+                    //   style: GoogleFonts.poppins(
+                    //     fontSize: 12.0,
+                    //     color: isDarkMode ? Colors.white54 : Colors.grey,
+                    //   ),
+                    // ),
                     SizedBox(height: 20),
                     _buildTextFormField(
                       label: 'Name',

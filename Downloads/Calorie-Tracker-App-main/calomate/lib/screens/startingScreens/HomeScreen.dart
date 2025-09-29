@@ -114,16 +114,21 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
       ),
       leading: Padding(
         padding: EdgeInsets.only(left: screenWidth * 0.04),
-        child: user != null && user.profileImageUrl != null
-            ? CircleAvatar(
-          radius: screenWidth * 0.02,
-          backgroundImage: CachedNetworkImageProvider(user.profileImageUrl!),
-        )
-            : CircleAvatar(
-          radius: screenWidth * 0.02,
-          backgroundColor: Colors.grey[300],
-          child: Icon(Icons.person, color: Colors.white),
+        child: CircleAvatar(
+          radius: 60,
+          backgroundImage: const AssetImage('assets/images/img_1.png'),
+          backgroundColor: Colors.green.shade100,
         ),
+        // user != null && user.profileImageUrl != null
+        //     ? CircleAvatar(
+        //   radius: screenWidth * 0.02,
+        //   backgroundImage: CachedNetworkImageProvider(user.profileImageUrl!),
+        // )
+        //     : CircleAvatar(
+        //   radius: screenWidth * 0.02,
+        //   backgroundColor: Colors.grey[300],
+        //   child: Icon(Icons.person, color: Colors.white),
+        // ),
       ),
       title: Center(
         child: Text(
