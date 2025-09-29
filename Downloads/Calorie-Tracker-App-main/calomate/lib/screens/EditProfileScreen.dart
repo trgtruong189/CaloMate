@@ -71,7 +71,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Edit Profile',
+          'Chỉnh sửa hồ sơ',
           style: GoogleFonts.poppins(
             color: isDarkMode ? Colors.greenAccent : Colors.white,
           ),
@@ -216,7 +216,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ),
                       child: Text(
-                        'Save Changes',
+                        'Cập nhật',
                         style: GoogleFonts.poppins(
                           color: isDarkMode ? Colors.black : Colors.white,
                         ),

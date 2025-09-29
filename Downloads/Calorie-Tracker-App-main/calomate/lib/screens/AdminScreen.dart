@@ -16,7 +16,7 @@ class AdminScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Admin Panel',
+          'Trang quản trị',
           style: TextStyle(
             color: isDarkMode ? Colors.greenAccent : Colors.white,
           ),

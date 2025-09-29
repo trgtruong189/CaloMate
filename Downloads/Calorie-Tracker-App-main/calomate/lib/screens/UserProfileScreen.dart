@@ -120,11 +120,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               onTap: () {},
               child: CircleAvatar(
                 radius: 60,
-                backgroundImage: user.profileImageUrl == null
-                    ? AssetImage('assets/profile_placeholder.png')
-                    : NetworkImage(user.profileImageUrl!) as ImageProvider,
+                backgroundImage: const AssetImage('assets/images/img_1.png'),
                 backgroundColor: Colors.green.shade100,
               ),
+
             ),
             SizedBox(height: 10),
             Text(

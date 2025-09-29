@@ -22,7 +22,7 @@ class UserManagementScreen extends StatelessWidget {
       backgroundColor: backgroundColor,
       appBar: AppBar(
         title: Text(
-          'Manage Users',
+          'Quản lý người dùng',
           style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
         ),
         backgroundColor: isDarkMode ? Colors.transparent : Colors.green[700],

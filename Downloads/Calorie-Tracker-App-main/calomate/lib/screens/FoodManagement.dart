@@ -78,7 +78,7 @@ class FoodManagementScreen extends StatelessWidget {
       backgroundColor: isDarkMode ? Colors.black : Colors.white,
       appBar: AppBar(
         title: Text(
-          'Manage Food Items',
+          'Quản lý món ăn',
           style: TextStyle(
             color: isDarkMode ? Colors.greenAccent : Colors.white,
             fontWeight: FontWeight.bold,

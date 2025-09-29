@@ -25,6 +25,7 @@ class AddFoodScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Thêm món ăn"),
+        backgroundColor: Colors.green[800],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -95,7 +96,7 @@ class AddFoodScreen extends StatelessWidget {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.primaryColor,
+                    backgroundColor: Colors.green[800],
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

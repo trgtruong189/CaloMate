@@ -17,7 +17,7 @@ class AccountSettingsScreen extends StatelessWidget {
         backgroundColor: isDarkMode ? Colors.black : Colors.teal[700],
         elevation: 0,
         title: Text(
-          'Càiddặt tài khoản',
+          'Cài đặt tài khoản',
           style: GoogleFonts.poppins(
             color: isDarkMode ? Colors.greenAccent : Colors.white,
             fontSize: 24,

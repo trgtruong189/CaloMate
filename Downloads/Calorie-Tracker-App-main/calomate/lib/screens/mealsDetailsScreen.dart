@@ -26,7 +26,7 @@ class MealDetailsScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Meal Details',
+          'Chi tiết món ăn',
           style: TextStyle(
             color: isDarkMode ? Colors.white : Colors.black,
             fontSize: 24,
@@ -178,14 +178,14 @@ class MealDetailsScreen extends StatelessWidget {
           await userProvider.logFood(meal);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Meal added to your food log!'),
+              content: Text('Đã thêm món ăn vào thực đơn!'),
               behavior: SnackBarBehavior.floating,
               duration: Duration(seconds: 2),
             ),
           );
         },
         child: Text(
-          'Log this Meal',
+          'Thêm vào thực đơn',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,

@@ -488,11 +488,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
         children: [
           _sectionTitle('Đặt mục tiêu hằng ngày', isDarkMode),
           const SizedBox(height: 10),
-          TextField(
-            controller: caloryController,
-            decoration: const InputDecoration(labelText: "Calories mục tiêu"),
-            keyboardType: TextInputType.number,
-          ),
+
           const SizedBox(height: 10),
           TextField(
             controller: waterController,

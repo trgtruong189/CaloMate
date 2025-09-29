@@ -92,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(height: 20.0),
                       _buildTextField(
                         controller: passwordController,
-                        hintText: 'nhập mật khẩu',
+                        hintText: 'Nhập mật khẩu',
                         labelText: 'Password',
                         icon: CupertinoIcons.lock,
                         obscureText: true,
