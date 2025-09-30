@@ -14,7 +14,7 @@ class ThemeScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: themeProvider.isDarkMode ? Colors.black : Colors.green[700],
         title: Text(
-          'Theme Settings',
+          'Cài đặt giao diện',
           style: GoogleFonts.poppins(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -81,7 +81,7 @@ class ThemeScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Choose a Theme Accent Color:',
+                        'Chọn màu nền',
                         style: GoogleFonts.poppins(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -112,7 +112,7 @@ class ThemeScreen extends StatelessWidget {
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Theme settings updated'),
+                      content: Text('Giao diện cập nhật thành công'),
                       backgroundColor: themeProvider.isDarkMode
                           ? Colors.greenAccent
                           : Colors.green,
@@ -128,7 +128,7 @@ class ThemeScreen extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'Save Changes',
+                  'Lưu thay đổi',
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,

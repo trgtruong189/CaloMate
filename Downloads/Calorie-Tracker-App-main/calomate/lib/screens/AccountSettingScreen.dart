@@ -14,7 +14,7 @@ class AccountSettingsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: isDarkMode ? Colors.black : Colors.teal[700],
+        backgroundColor: isDarkMode ? Colors.black : Colors.greenAccent,
         elevation: 0,
         title: Text(
           'Cài đặt tài khoản',
@@ -33,8 +33,8 @@ class AccountSettingsScreen extends StatelessWidget {
           children: [
             _buildAccountOption(
               context,
-              title: 'Change Email',
-              subtitle: 'Update your email address',
+              title: 'Đổi Email',
+              subtitle: 'Cập nhật địa chỉ email mới của bạn',
               icon: Icons.email_outlined,
               color: Colors.blueAccent,
               onTap: () {
@@ -48,8 +48,8 @@ class AccountSettingsScreen extends StatelessWidget {
             ),
             _buildAccountOption(
               context,
-              title: 'Change Password',
-              subtitle: 'Update your password',
+              title: 'Đổi mật khẩu',
+              subtitle: 'Cập nhật mật khẩu mới của bạn',
               icon: Icons.lock_outline,
               color: Colors.redAccent,
               onTap: () {
@@ -63,19 +63,19 @@ class AccountSettingsScreen extends StatelessWidget {
             ),
             _buildAccountOption(
               context,
-              title: 'Update Phone Number',
-              subtitle: 'Change your phone number',
+              title: 'Thêm số điện thoại',
+              subtitle: 'Thêm số điện thoại của bạn',
               icon: Icons.phone_outlined,
               color: Colors.greenAccent,
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Update Phone Number clicked')),
+                  SnackBar(content: Text('Tính năng sẽ được cập nhật sớm nhất')),
                 );
               },
             ),
             _buildAccountOption(
               context,
-              title: 'Manage Linked Accounts',
+              title: 'Liên kết tài khoản',
               subtitle: 'View or remove linked accounts',
               icon: Icons.link_outlined,
               color: Colors.orangeAccent,
@@ -93,7 +93,7 @@ class AccountSettingsScreen extends StatelessWidget {
               color: Colors.amberAccent,
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Deactivate Account clicked')),
+                  SnackBar(content: Text('Tính năng sẽ được cập nhật sớm nhất')),
                 );
               },
             ),
@@ -105,7 +105,7 @@ class AccountSettingsScreen extends StatelessWidget {
               color: Colors.pinkAccent,
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Delete Account clicked')),
+                  SnackBar(content: Text('Tính năng sẽ được cập nhật sớm nhất')),
                 );
               },
             ),
